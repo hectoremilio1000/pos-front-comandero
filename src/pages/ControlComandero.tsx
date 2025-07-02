@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button, Card, Select, Pagination } from "antd";
 import { FaTable } from "react-icons/fa";
 import RegistroMesaModal from "@/components/RegistroMesaModal";
+import CapturaComandaModal from "@/components/CapturaComandaModal";
 import { FaMapLocationDot } from "react-icons/fa6";
 import { MdPointOfSale, MdTableBar } from "react-icons/md";
 import { GiForkKnifeSpoon } from "react-icons/gi";
@@ -44,6 +45,13 @@ const ControlComandero: React.FC = () => {
     (paginaActual - 1) * viewPaginate,
     paginaActual * viewPaginate
   );
+
+  const [modalComandaVisible, setModalComandaVisible] = useState(false);
+  const [mesaReciente, setMesaReciente] = useState(-1);
+  const handleCapturaModal = (i: number) => {
+    setMesaReciente(i);
+    setModalComandaVisible(true);
+  };
 
   return (
     <>
@@ -93,7 +101,11 @@ const ControlComandero: React.FC = () => {
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
               {mesasPaginadas.map((mesa, i) => (
-                <Card key={i} className="text-center shadow">
+                <Card
+                  onClick={() => handleCapturaModal(i)}
+                  key={i}
+                  className="text-center shadow cursor-pointer"
+                >
                   <FaTable className="text-4xl text-blue-500 mx-auto" />
                   <p className="font-bold mt-2">{mesa.nombre}</p>
                   <p>{mesa.personas} personas</p>
@@ -127,8 +139,15 @@ const ControlComandero: React.FC = () => {
           onClose={() => setModalVisible(false)}
           onRegistrar={(mesa) => {
             setMesas([...mesas, mesa]);
+            setMesaReciente(mesas.length + 1); // <- guarda el nombre de la mesa
             setModalVisible(false);
+            setTimeout(() => setModalComandaVisible(true), 300); // <- abre modal de productos
           }}
+        />
+        <CapturaComandaModal
+          visible={modalComandaVisible}
+          mesa={mesaReciente}
+          onClose={() => setModalComandaVisible(false)}
         />
       </div>
     </>
