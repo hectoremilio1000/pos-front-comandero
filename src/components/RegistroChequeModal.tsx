@@ -6,8 +6,8 @@ import TecladoVirtual from "./TecladoVirtual";
 type Props = {
   visible: boolean;
   onClose: () => void;
-  onRegistrar: (mesa: {
-    nombre: string;
+  onRegistrar: (cheque: {
+    cuenta: string;
     personas: number;
     area: string;
   }) => void;
@@ -16,27 +16,31 @@ type Props = {
 const { Step } = Steps;
 const { Option } = Select;
 
-const RegistroMesaModal: React.FC<Props> = ({
+const RegistroChequeModal: React.FC<Props> = ({
   visible,
   onClose,
   onRegistrar,
 }) => {
   const [step, setStep] = useState(0);
-  const [nombre, setNombre] = useState("");
+  const [cuenta, setCuenta] = useState("");
+  const [mesa, setMesa] = useState(null);
   const [personas, setPersonas] = useState("");
   const [area, setArea] = useState("Comedor");
+  const [fecha_inicio, setFecha_inicio] = useState(null);
+  const [fecha_cierre, setFecha_cierre] = useState(null);
+  const [mesero_id, setMesero_id] = useState(null);
 
   const avanzar = () => setStep((s) => s + 1);
   const retroceder = () => setStep((s) => s - 1);
 
   const limpiar = () => {
-    setNombre("");
+    setCuenta("");
     setPersonas("");
     setArea("Comedor");
   };
 
   const registrar = () => {
-    onRegistrar({ nombre, personas: Number(personas), area });
+    onRegistrar({ cuenta, personas: Number(personas), area });
     limpiar();
     setStep(0);
   };
@@ -47,12 +51,12 @@ const RegistroMesaModal: React.FC<Props> = ({
         return (
           <div>
             <p className="mb-2 font-semibold">Nombre de la mesa:</p>
-            <Input value={nombre} readOnly className="mb-4 text-lg" />
+            <Input value={cuenta} readOnly className="mb-4 text-lg" />
             <TecladoVirtual
-              onKeyPress={(v) => setNombre((prev) => prev + v)}
-              onBackspace={() => setNombre((prev) => prev.slice(0, -1))}
-              onSpace={() => setNombre((prev) => prev + " ")}
-              onClear={() => setNombre("")}
+              onKeyPress={(v) => setCuenta((prev) => prev + v)}
+              onBackspace={() => setCuenta((prev) => prev.slice(0, -1))}
+              onSpace={() => setCuenta((prev) => prev + " ")}
+              onClear={() => setCuenta("")}
             />
           </div>
         );
@@ -83,7 +87,7 @@ const RegistroMesaModal: React.FC<Props> = ({
             <div className="mt-4 p-4 border rounded bg-white shadow">
               <p className="font-semibold">Resumen:</p>
               <p>
-                <strong>Nombre:</strong> {nombre}
+                <strong>Cuenta:</strong> {cuenta}
               </p>
               <p>
                 <strong>Personas:</strong> {personas}
@@ -137,4 +141,4 @@ const RegistroMesaModal: React.FC<Props> = ({
   );
 };
 
-export default RegistroMesaModal;
+export default RegistroChequeModal;

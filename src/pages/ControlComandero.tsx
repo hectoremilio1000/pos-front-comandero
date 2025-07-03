@@ -1,11 +1,18 @@
 import { useState } from "react";
-import { Button, Card, Select, Pagination } from "antd";
-import { FaTable } from "react-icons/fa";
-import RegistroMesaModal from "@/components/RegistroMesaModal";
+import { Button, Card, Select, Pagination, Modal } from "antd";
+import { FaCashRegister, FaTable, FaUserEdit } from "react-icons/fa";
 import CapturaComandaModal from "@/components/CapturaComandaModal";
 import { FaMapLocationDot } from "react-icons/fa6";
-import { MdPointOfSale, MdTableBar } from "react-icons/md";
+import {
+  MdPlaylistAddCheck,
+  MdPointOfSale,
+  MdRestore,
+  MdSearch,
+  MdTableBar,
+} from "react-icons/md";
 import { GiForkKnifeSpoon } from "react-icons/gi";
+import RegistroChequeModal from "@/components/RegistroChequeModal";
+import { RiPrinterLine } from "react-icons/ri";
 
 const { Option } = Select;
 
@@ -13,46 +20,39 @@ const AREAS = ["Todas", "Comedor", "Terraza", "1er Piso"];
 
 const ControlComandero: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
-  const [mesas, setMesas] = useState<any[]>([
-    { nombre: "G5", personas: 5, area: "Comedor" },
-    { nombre: "S15", personas: 1, area: "Terrazas" },
-    { nombre: "L45", personas: 1, area: "Terrazas" },
-    { nombre: "POY45", personas: 1, area: "Terrazas" },
-    { nombre: "MESA 05", personas: 1, area: "Terrazas" },
-    { nombre: "MESA 05", personas: 1, area: "Terrazas" },
-    { nombre: "MESA 05", personas: 1, area: "Terrazas" },
-    { nombre: "MESA 05", personas: 1, area: "Terrazas" },
-    { nombre: "MESA 05", personas: 1, area: "Terrazas" },
-    { nombre: "MESA 05", personas: 1, area: "Terrazas" },
-    { nombre: "MESA 05", personas: 1, area: "Terrazas" },
-    { nombre: "MESA 05", personas: 1, area: "Terrazas" },
-    { nombre: "MESA 05", personas: 1, area: "Terrazas" },
-    { nombre: "MESA 05", personas: 1, area: "Terrazas" },
-    { nombre: "MESA 05", personas: 1, area: "Terrazas" },
-    { nombre: "MESA 05", personas: 1, area: "Terrazas" },
-    { nombre: "MESA 05", personas: 1, area: "Terrazas" },
-    { nombre: "MESA 05", personas: 1, area: "Terrazas" },
+  const [detalle_cheque, setDetalle_cheque] = useState([]);
+  const [cheques, setCheques] = useState<any[]>([
+    { cuenta: "G5", personas: 5, area: "Comedor" },
+    { cuenta: "S15", personas: 1, area: "Terrazas" },
+    { cuenta: "L45", personas: 1, area: "Terrazas" },
+    { cuenta: "POY45", personas: 1, area: "Terrazas" },
   ]);
   const [areaSeleccionada, setAreaSeleccionada] = useState("Todas");
   const [paginaActual, setPaginaActual] = useState(1);
   const viewPaginate = 10;
-  const mesasFiltradas =
+  const chequesFiltrados =
     areaSeleccionada === "Todas"
-      ? mesas
-      : mesas.filter((m) => m.area === areaSeleccionada);
+      ? cheques
+      : cheques.filter((c) => c.area === areaSeleccionada);
 
-  const mesasPaginadas = mesasFiltradas.slice(
+  const chequesPaginados = chequesFiltrados.slice(
     (paginaActual - 1) * viewPaginate,
     paginaActual * viewPaginate
   );
-
+  const [accionesChequeVisible, setAccionesChequeVisible] = useState(false);
   const [modalComandaVisible, setModalComandaVisible] = useState(false);
   const [mesaReciente, setMesaReciente] = useState(-1);
-  const handleCapturaModal = (i: number) => {
-    setMesaReciente(i);
+  const handleCapturaModal = () => {
     setModalComandaVisible(true);
   };
-
+  const handleAccionesCheque = (i: number) => {
+    //indice
+    setMesaReciente(i);
+    setAccionesChequeVisible(true);
+  };
+  const mandarComanda = () => {
+    console.log(detalle_cheque);
+  };
   return (
     <>
       <div className="w-full bg-blue-800 px-4 py-2">
@@ -100,14 +100,14 @@ const ControlComandero: React.FC = () => {
               </Select>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-              {mesasPaginadas.map((mesa, i) => (
+              {chequesPaginados.map((mesa, i) => (
                 <Card
-                  onClick={() => handleCapturaModal(i)}
+                  onClick={() => handleAccionesCheque(i)}
                   key={i}
                   className="text-center shadow cursor-pointer"
                 >
                   <FaTable className="text-4xl text-blue-500 mx-auto" />
-                  <p className="font-bold mt-2">{mesa.nombre}</p>
+                  <p className="font-bold mt-2">{mesa.cuenta}</p>
                   <p>{mesa.personas} personas</p>
                   <p className="text-sm text-gray-500">{mesa.area}</p>
                 </Card>
@@ -116,7 +116,7 @@ const ControlComandero: React.FC = () => {
             <div className="mt-6 flex justify-center">
               <Pagination
                 current={paginaActual}
-                total={mesasFiltradas.length}
+                total={chequesFiltrados.length}
                 pageSize={15}
                 onChange={setPaginaActual}
               />
@@ -127,19 +127,69 @@ const ControlComandero: React.FC = () => {
               <p className="text-lg font-bold">Jampier Me</p>
             </Card>
             <div className="w-full">
-              <button className="w-full px-3 py-2 bg-blue-600 text-white text-sm font-bold flex items-center gap-2 ">
+              <button className="w-full px-3 py-2 bg-blue-600 text-white text-sm font-bold flex flex-col rounded justify-center items-center gap-2 ">
                 <FaMapLocationDot /> Mapa de mesas
               </button>
             </div>
           </div>
         </div>
+        <Modal
+          footer={false}
+          closeIcon={false}
+          open={accionesChequeVisible}
+          onCancel={() => setAccionesChequeVisible(false)}
+        >
+          <div className="w-full">
+            <div className="grid grid-cols-4 gap-4">
+              <div className="col-span-3">
+                <div className="grid grid-cols-3 gap-4">
+                  <button
+                    className="flex flex-col rounded justify-center items-center gap-2 w-full py-2 px-4 bg-gray-300 text-gray-800"
+                    onClick={() => handleCapturaModal()}
+                  >
+                    <MdPlaylistAddCheck className="text-[25px] " />
+                    Capturar
+                  </button>
+                  <button className="flex flex-col rounded justify-center items-center gap-2 w-full py-2 px-4 bg-gray-300 text-gray-800">
+                    <MdSearch className="text-[25px] " />
+                    Consultar
+                  </button>
+                  <button className="flex flex-col rounded justify-center items-center gap-2 w-full py-2 px-4 bg-gray-300 text-gray-800">
+                    <FaUserEdit className="text-[25px] " />
+                    Cambiar Mesero
+                  </button>
+                  <button className="flex flex-col rounded justify-center items-center gap-2 w-full py-2 px-4 bg-gray-300 text-gray-800">
+                    <RiPrinterLine className="text-[25px] " />
+                    Imprimir Cuenta
+                  </button>
+                  <button className="flex flex-col rounded justify-center items-center gap-2 w-full py-2 px-4 bg-gray-300 text-gray-800">
+                    <FaCashRegister className="text-[25px] " />
+                    Pagar
+                  </button>
+                  <button className="flex flex-col rounded justify-center items-center gap-2 w-full py-2 px-4 bg-gray-300 text-gray-800">
+                    <MdRestore className="text-[25px] " />
+                    Reabrir Cuenta
+                  </button>
+                </div>
+              </div>
+              <div className="col-span-1">
+                <button
+                  className="w-full h-full py-2 px-4 rounded bg-red-500 text-white text-md font-bold"
+                  onClick={() => setAccionesChequeVisible(false)}
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
+        </Modal>
 
-        <RegistroMesaModal
+        <RegistroChequeModal
           visible={modalVisible}
           onClose={() => setModalVisible(false)}
-          onRegistrar={(mesa) => {
-            setMesas([...mesas, mesa]);
-            setMesaReciente(mesas.length + 1); // <- guarda el nombre de la mesa
+          onRegistrar={(cheque) => {
+            setCheques([...cheques, cheque]);
+            setMesaReciente(cheques.length + 1); // <- guarda el nombre de la mesa
             setModalVisible(false);
             setTimeout(() => setModalComandaVisible(true), 300); // <- abre modal de productos
           }}
@@ -147,7 +197,10 @@ const ControlComandero: React.FC = () => {
         <CapturaComandaModal
           visible={modalComandaVisible}
           mesa={mesaReciente}
+          detalle_cheque={detalle_cheque}
+          setDetalle_cheque={setDetalle_cheque}
           onClose={() => setModalComandaVisible(false)}
+          mandarComanda={mandarComanda}
         />
       </div>
     </>

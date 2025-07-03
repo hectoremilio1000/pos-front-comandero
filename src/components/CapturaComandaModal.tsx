@@ -28,6 +28,9 @@ type Props = {
   visible: boolean;
   onClose: () => void;
   mesa: number;
+  detalle_cheque: any;
+  setDetalle_cheque: any;
+  mandarComanda: () => void;
 };
 
 const dummyProductos: Producto[] = [
@@ -67,11 +70,17 @@ const dummyProductos: Producto[] = [
   },
 ];
 
-const CapturaComandaModal: React.FC<Props> = ({ visible, onClose, mesa }) => {
+const Capturadetalle_chequeModal: React.FC<Props> = ({
+  visible,
+  onClose,
+  mesa,
+  detalle_cheque,
+  setDetalle_cheque,
+  mandarComanda,
+}) => {
   const [productos] = useState<Producto[]>(
     dummyProductos.filter((p) => !p.suspendido)
   );
-  const [comanda, setComanda] = useState<ProductoSeleccionado[]>([]);
   const [cantidadSeleccionada, setCantidadSeleccionada] = useState(1);
   const [tiempoSeleccionado, setTiempoSeleccionado] = useState("1er Tiempo");
   const [comentarioIndex, setComentarioIndex] = useState<number | null>(null);
@@ -93,7 +102,7 @@ const CapturaComandaModal: React.FC<Props> = ({ visible, onClose, mesa }) => {
   );
 
   const agregarProducto = (producto: Producto) => {
-    setComanda((prev) => [
+    setDetalle_cheque((prev: any) => [
       ...prev,
       {
         producto,
@@ -104,13 +113,15 @@ const CapturaComandaModal: React.FC<Props> = ({ visible, onClose, mesa }) => {
   };
 
   const eliminarProducto = (index: number) => {
-    setComanda((prev) => prev.filter((_, i) => i !== index));
+    setDetalle_cheque((prev: any) =>
+      prev.filter((_: any, i: number) => i !== index)
+    );
   };
 
   const cambiarComentario = (index: number, texto: string) => {
-    const nueva = [...comanda];
+    const nueva = [...detalle_cheque];
     nueva[index].comentario = texto;
-    setComanda(nueva);
+    setDetalle_cheque(nueva);
     setComentarioIndex(null);
     setModalComentarioVisible(false);
   };
@@ -133,7 +144,7 @@ const CapturaComandaModal: React.FC<Props> = ({ visible, onClose, mesa }) => {
             setModalComentarioVisible(true);
           }}
         >
-          💬 {comanda[index].comentario ? "✔️" : ""}
+          💬 {detalle_cheque[index].comentario ? "✔️" : ""}
         </Button>
       ),
     },
@@ -186,7 +197,7 @@ const CapturaComandaModal: React.FC<Props> = ({ visible, onClose, mesa }) => {
             </div>
           </div>
           <Table
-            dataSource={comanda}
+            dataSource={detalle_cheque}
             columns={columnas}
             rowKey={(_, i) => i?.toString() || ""}
             pagination={false}
@@ -195,77 +206,65 @@ const CapturaComandaModal: React.FC<Props> = ({ visible, onClose, mesa }) => {
             <Button
               danger
               icon={<DeleteOutlined />}
-              onClick={() => setComanda([])}
+              onClick={() => setDetalle_cheque([])}
             >
               Eliminar todo
             </Button>
-            <Button type="primary" icon={<PlusOutlined />}>
-              Aceptar comanda
+            <Button
+              onClick={() => mandarComanda()}
+              type="primary"
+              icon={<PlusOutlined />}
+            >
+              Aceptar detalle_cheque
             </Button>
           </div>
         </div>
 
-        <div className="w-5/12 max-h-[650px] overflow-y-auto pr-2">
+        <div className="w-5/12 max-h-[650px] overflow-y-auto pr-2 border-l-2 border-gray-200 pl-4">
+          <div className="flex flex-wrap gap-2 mb-4">
+            {grupos.map((g) => (
+              <button
+                className={`cursor-pointer rounded px-2 py-2  ${g === busquedaGrupo ? "bg-blue-600 text-white" : "bg-gray-100 text-gray-800"}`}
+                key={g}
+                onClick={() => setBusquedaGrupo(g)}
+              >
+                {g}
+              </button>
+            ))}
+          </div>
           <div className="mb-2">
-            <div className="mb-1 font-semibold">Buscar grupo</div>
-            <input
-              readOnly
-              value={busquedaGrupo}
-              onFocus={() => setBuscando("grupo")}
-              onBlur={() => setBuscando(null)}
-              className="w-full px-2 py-1 border rounded mb-2"
-              placeholder="Toca para buscar grupo..."
-            />
-            {buscando === "grupo" ? (
-              <TecladoVirtual
-                onKeyPress={(v) => {
-                  setBusquedaGrupo((prev) => prev + v);
-                }}
-                onBackspace={() => {
-                  setBusquedaGrupo((prev) => prev.slice(0, -1));
-                }}
-                onSpace={() => {
-                  setBusquedaGrupo((prev) => prev + " ");
-                }}
-                onClear={() => {
-                  setBusquedaGrupo("");
-                }}
-              />
-            ) : null}
-
             <div className="mb-1 font-semibold">Buscar producto</div>
             <input
-              readOnly
               value={busquedaProducto}
-              onFocus={() => setBuscando("producto")}
-              onBlur={() => setBuscando(null)}
+              onChange={(e) => setBusquedaProducto(e.target.value)}
+              onClick={() => setBuscando("producto")}
               className="w-full px-2 py-1 border rounded mb-4"
               placeholder="Toca para buscar producto..."
             />
             {buscando === "producto" ? (
-              <TecladoVirtual
-                onKeyPress={(v) => {
-                  setBusquedaProducto((prev) => prev + v);
-                }}
-                onBackspace={() => {
-                  setBusquedaProducto((prev) => prev.slice(0, -1));
-                }}
-                onSpace={() => {
-                  setBusquedaProducto((prev) => prev + " ");
-                }}
-                onClear={() => {
-                  setBusquedaProducto("");
-                }}
-              />
+              <>
+                <button
+                  onClick={() => setBuscando(null)}
+                  className="bg-gray-100 text-gray-500 px-2 py-2 rounded"
+                >
+                  cerrar
+                </button>
+                <TecladoVirtual
+                  onKeyPress={(v) => {
+                    setBusquedaProducto((prev) => prev + v);
+                  }}
+                  onBackspace={() => {
+                    setBusquedaProducto((prev) => prev.slice(0, -1));
+                  }}
+                  onSpace={() => {
+                    setBusquedaProducto((prev) => prev + " ");
+                  }}
+                  onClear={() => {
+                    setBusquedaProducto("");
+                  }}
+                />
+              </>
             ) : null}
-          </div>
-
-          <div className="flex flex-wrap gap-2 mb-4">
-            {grupos.map((g) => (
-              <Button key={g} onClick={() => setBusquedaGrupo(g)}>
-                {g}
-              </Button>
-            ))}
           </div>
           <div className="grid grid-cols-2 gap-2">
             {productosFiltrados.map((p) => (
@@ -284,7 +283,7 @@ const CapturaComandaModal: React.FC<Props> = ({ visible, onClose, mesa }) => {
       {comentarioIndex !== null && (
         <ComentarioProductoModal
           visible={true}
-          comentarioInicial={comanda[comentarioIndex]?.comentario || ""}
+          comentarioInicial={detalle_cheque[comentarioIndex]?.comentario || ""}
           onClose={() => {
             setModalComentarioVisible(false);
             setComentarioIndex(null);
@@ -296,4 +295,4 @@ const CapturaComandaModal: React.FC<Props> = ({ visible, onClose, mesa }) => {
   );
 };
 
-export default CapturaComandaModal;
+export default Capturadetalle_chequeModal;
