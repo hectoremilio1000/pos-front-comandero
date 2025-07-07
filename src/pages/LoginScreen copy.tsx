@@ -8,24 +8,13 @@ const LoginScreen: React.FC = () => {
   const navigate = useNavigate();
   const [password, setPassword] = useState<string>("");
   const [email, setEmail] = useState<string>("");
-  const [emailOpen, setEmailOpen] = useState<boolean>(false);
-  const [passwordOpen, setPasswordOpen] = useState<boolean>(false);
   const apiUrl = import.meta.env.VITE_API_URL;
   console.log(apiUrl);
 
-  const handleClick = (value: string | number) => {
-    setPassword((prev) => prev + value.toString());
-  };
-  const handleCancelEmail = () => {
-    setEmailOpen(false);
-  };
   const handleLogin = () => {
     if (password === "1234") navigate("/control");
   };
 
-  const handleDelete = () => {
-    setPassword("");
-  };
   const [modalActiveTeclado, setModalActiveTeclado] = useState(false);
   const [tecladoActive, setTecladoActive] = useState("");
   const handleClickInput = (input: string) => {

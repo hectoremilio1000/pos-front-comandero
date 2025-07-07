@@ -123,7 +123,7 @@ const ControlComandero: React.FC = () => {
             </div>
           </div>
           <div className="col-span-1 flex flex-col gap-6 bg-gray-100 p-4">
-            <Card title="Mesero" bordered className="w-40 text-center w-full">
+            <Card title="Mesero" bordered className="text-center w-full">
               <p className="text-lg font-bold">Jampier Me</p>
             </Card>
             <div className="w-full">
