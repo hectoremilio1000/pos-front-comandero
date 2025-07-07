@@ -1,33 +1,30 @@
 // src/pages/LoginScreen.tsx
-import { useAuth } from "@/components/Auth/AuthContext";
 import TecladoVirtual from "@/components/TecladoVirtual";
-import { Button, message, Modal } from "antd";
-import { useEffect, useState } from "react";
+import { Button, Modal } from "antd";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const LoginScreen: React.FC = () => {
+  const navigate = useNavigate();
   const [password, setPassword] = useState<string>("");
   const [email, setEmail] = useState<string>("");
+  const [emailOpen, setEmailOpen] = useState<boolean>(false);
+  const [passwordOpen, setPasswordOpen] = useState<boolean>(false);
+  const apiUrl = import.meta.env.VITE_API_URL;
+  console.log(apiUrl);
 
-  const { token, login } = useAuth();
-  const navigate = useNavigate();
-  useEffect(() => {
-    if (token) navigate("/control"); // 🔁 Si ya está logueado, redirige
-  }, [token]);
+  const handleClick = (value: string | number) => {
+    setPassword((prev) => prev + value.toString());
+  };
+  const handleCancelEmail = () => {
+    setEmailOpen(false);
+  };
+  const handleLogin = () => {
+    if (password === "1234") navigate("/control");
+  };
 
-  const handleLogin = async () => {
-    if (email === "" || password === "") {
-      message.warning(
-        "EL Email y el password deben estar llenos para continuar"
-      );
-    }
-    try {
-      await login(email, password);
-    } catch (err) {
-      console.log(err);
-      alert("Error de autenticación");
-    }
-    // if (password === "1234") navigate("/control");
+  const handleDelete = () => {
+    setPassword("");
   };
   const [modalActiveTeclado, setModalActiveTeclado] = useState(false);
   const [tecladoActive, setTecladoActive] = useState("");
@@ -38,23 +35,38 @@ const LoginScreen: React.FC = () => {
 
   return (
     <div className="p-4 w-full min-h-screen flex flex-col justify-center items-center bg-blue-700  text-gray-800 font-sans">
-      <div className="grid grid-cols-4 gap-4 w-full">
-        <div className="w-full mb-8 col-span-4 md:col-span-2 lg:col-span-2"></div>
-
-        <div className="flex flex-col gap-4 justify-center items-center col-span-4 md:col-span-2 lg:col-span-2">
+      <div className="grid grid-cols-3 gap-4 w-full">
+        <div className="w-full mb-8 col-span-3 md:col-span-3 lg:col-span-2">
           <div className="w-full mt-8 text-white text-lg">
             🕒 {new Date().toLocaleString("es-MX", { hour12: false })}
           </div>
-          <div className="py-12 w-full">
+          <div className="py-12">
             <h1 className="font-bold">
-              <span className="text-white  w-full inline-block text-3xl md:text-4xl">
+              <span className="text-white text-3xl md:text-4xl">
                 GrowthSuite
               </span>
-              <span className="text-yellow-500 w-full inline-block  text-3xl md:text-6xl">
+              <span className="text-yellow-500 text-3xl md:text-6xl">
                 Comandero
               </span>
             </h1>
           </div>
+          <div className="col-span-1 grid grid-cols-2 gap-4 text-center">
+            <div className="p-4 bg-white shadow rounded">
+              <h2 className="font-semibold text-lg mb-2">
+                BEBIDAS MÁS VENDIDAS
+              </h2>
+              <p>No hay datos para mostrar.</p>
+            </div>
+            <div className="p-4 bg-white shadow rounded">
+              <h2 className="font-semibold text-lg mb-2">
+                OTROS (PRODUCTOS) MÁS VENDIDOS
+              </h2>
+              <p>No hay datos para mostrar.</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-4 justify-center items-center col-span-3 md:col-span-3 lg:col-span-1">
           <label
             className="w-full text-start font-bold text-white"
             htmlFor="Username"
@@ -148,6 +160,25 @@ const LoginScreen: React.FC = () => {
           >
             ENTRAR <span>➡️</span>
           </button>
+        </div>
+
+        <div className="overflow-auto grid grid-cols-2 md:grid-cols-7 gap-2 col-span-3 text-sm">
+          {[
+            "CLIENTES",
+            "MESEROS",
+            "ASISTENCIAS",
+            "PROMOCIONES",
+            "CONSULTAR PRECIOS",
+            "SUSPENDER PRODUCTOS",
+            "SALIR DE COMANDERO",
+          ].map((label, idx) => (
+            <div
+              key={idx}
+              className="bg-blue-400 text-white py-3 px-2 rounded shadow text-center"
+            >
+              {label}
+            </div>
+          ))}
         </div>
       </div>
     </div>

@@ -6,6 +6,8 @@ type Props = {
   onBackspace: () => void;
   onSpace: () => void;
   onClear: () => void;
+  text: string;
+  setTexto: React.Dispatch<React.SetStateAction<string>>;
 };
 
 const keys = [
@@ -30,9 +32,16 @@ const TecladoVirtual: React.FC<Props> = ({
   onBackspace,
   onSpace,
   onClear,
+  text,
+  setTexto,
 }) => {
   return (
     <div className="bg-white p-4 rounded shadow w-full mx-auto">
+      <textarea
+        value={text}
+        onChange={(e) => setTexto(e.target.value)}
+        className="w-full px-4 border-2 border-gray-300"
+      />
       <div className="grid grid-cols-10 gap-1 mb-2">
         {keys.map((k, i) => (
           <button
