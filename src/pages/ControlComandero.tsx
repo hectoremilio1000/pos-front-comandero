@@ -55,12 +55,6 @@ const ControlComandero: React.FC = () => {
   };
   return (
     <>
-      <div className="w-full bg-blue-800 px-4 py-2">
-        <h1 className="font-bold">
-          <span className="text-white text-3xl">GrowthSuite</span>
-          <span className="text-yellow-500 text-3xl">Comandero</span>
-        </h1>
-      </div>
       <div className="p-6 bg-gray-200 min-h-screen">
         <div className="grid grid-cols-6 gap-6">
           <div className="col-span-5">
@@ -123,9 +117,6 @@ const ControlComandero: React.FC = () => {
             </div>
           </div>
           <div className="col-span-1 flex flex-col gap-6 bg-gray-100 p-4">
-            <Card title="Mesero" bordered className="text-center w-full">
-              <p className="text-lg font-bold">Jampier Me</p>
-            </Card>
             <div className="w-full">
               <button className="w-full px-3 py-2 bg-blue-600 text-white text-sm font-bold flex flex-col rounded justify-center items-center gap-2 ">
                 <FaMapLocationDot /> Mapa de mesas

@@ -6,6 +6,7 @@ import ControlComandero from "./pages/ControlComandero";
 import "@ant-design/v5-patch-for-react-19";
 import { ProtectedRoute } from "./components/Auth/ProtectedRoute";
 import { AuthProvider } from "./components/Auth/AuthContext";
+import PrivateLayout from "./components/PrivateLayout";
 
 function App() {
   return (
@@ -13,14 +14,17 @@ function App() {
       <AuthProvider>
         <Routes>
           <Route path="/" element={<LoginScreen />} />
+
           <Route
-            path="/control"
             element={
               <ProtectedRoute>
-                <ControlComandero />
+                <PrivateLayout />
               </ProtectedRoute>
             }
-          />
+          >
+            <Route path="/control" element={<ControlComandero />} />
+            {/* Aquí puedes añadir más rutas protegidas */}
+          </Route>
         </Routes>
       </AuthProvider>
     </Router>

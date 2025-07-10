@@ -2,7 +2,14 @@ import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";
 
 import { useNavigate } from "react-router-dom";
+import apiAuth from "../apis/apiAuth";
 
+interface Restaurant {
+  id: number;
+  name: string;
+  address?: string;
+  // Puedes agregar más campos si los necesitas (phone, city, etc.)
+}
 interface User {
   id: number;
   email: string;
@@ -11,6 +18,7 @@ interface User {
     code: string;
     name: string;
   };
+  restaurant: Restaurant;
 }
 
 interface AuthContextType {
@@ -33,26 +41,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const storedToken = sessionStorage.getItem("token");
-    const storedUser = sessionStorage.getItem("user");
-
-    if (storedToken && storedUser) {
+    if (storedToken) {
       setToken(storedToken);
-      setUser(JSON.parse(storedUser));
+      // Obtiene el usuario desde el backend
+      apiAuth
+        .get("/me")
+        .then((res) => setUser(res.data))
+        .catch(() => logout());
     }
     setLoading(false);
   }, []);
-
+  const apiUrlLogin = import.meta.env.VITE_API_URL_AUTH;
   const login = async (email: string, password: string) => {
-    console.log(email, password);
-    const res = await axios.post("http://localhost:3333/api/login", {
+    const res = await axios.post(`${apiUrlLogin}/login`, {
       email,
       password,
     });
-    setToken(res.data.value);
-    setUser(res.data.user);
 
+    setToken(res.data.value);
     sessionStorage.setItem("token", res.data.value);
-    sessionStorage.setItem("user", JSON.stringify(res.data.user));
+
+    // Pide los datos del usuario desde /me
+    const meRes = await apiAuth.get("/me");
+    setUser(meRes.data);
 
     navigate("/control");
   };
